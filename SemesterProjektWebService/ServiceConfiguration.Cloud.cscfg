@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="SemesterProjektWebService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="WCFServiceWebRole1">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=2tportalvhdszgn92cm1gtmy;AccountKey=jOcXKj6EfbkrV277t4p6lOKot9B2211WAnHWakvbNVNzp4z60iQRwYj2QbKANxzyBdRx9m6pS9ZTUPA6A8aegw==" />
+    </ConfigurationSettings>
+  </Role>
+</ServiceConfiguration>
