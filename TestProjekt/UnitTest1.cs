@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WCFServiceWebRole1;
+using WCFServiceWebRole1.Models;
 
 namespace TestProjekt
 {
