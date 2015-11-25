@@ -8,12 +8,13 @@ namespace WCFServiceWebRole1
     public partial class DataContext : DbContext
     {
         public DataContext()
-            : base("name=DataContext3")
+            : base("name=DataContext4")
         {
         }
 
         public virtual DbSet<Bevaegelser> Bevaegelser { get; set; }
         public virtual DbSet<Brugere> Brugere { get; set; }
+        public virtual DbSet<Tid> Tid { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -32,6 +33,14 @@ namespace WCFServiceWebRole1
             modelBuilder.Entity<Brugere>()
                 .Property(e => e.Email)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<Tid>()
+                .Property(e => e.Fra)
+                .HasPrecision(0);
+
+            modelBuilder.Entity<Tid>()
+                .Property(e => e.Til)
+                .HasPrecision(0);
         }
     }
 }

@@ -20,7 +20,6 @@ namespace WCFServiceWebRole1
     // NOTE: In order to launch WCF GetCount Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-
         private const int Port = 7000;
         private static UdpClient _client;
         private static IPEndPoint _ipAddress;
