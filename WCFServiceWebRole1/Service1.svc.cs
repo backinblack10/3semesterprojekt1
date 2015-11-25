@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SendGrid;
+using WCFServiceWebRole1.Models;
 
 namespace WCFServiceWebRole1
 {
@@ -20,27 +21,27 @@ namespace WCFServiceWebRole1
     // NOTE: In order to launch WCF GetCount Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        private const int Port = 7000;
-        private static UdpClient _client;
-        private static IPEndPoint _ipAddress;
-        private static int _lastTemp;
-        private static Thread _t;
-        private static Task _ta;
+        private static int port = 7000;
+        private static UdpClient client;
+        private static IPEndPoint ipAddress;
+        private static int lastTemp;
+        private static Thread t;
+        private static Task ta;
 
         public Service1()
         {
-            if (_client == null)
+            if (client == null)
             {
-                _client = new UdpClient(Port) {EnableBroadcast = true};
+                client = new UdpClient(port) { EnableBroadcast = true };
             }
-            if (_ipAddress == null)
+            if (ipAddress == null)
             {
-                _ipAddress = new IPEndPoint(IPAddress.Any, Port);
+                ipAddress = new IPEndPoint(IPAddress.Any, port);
             }
 
-            if (_ta == null)
+            if (ta == null)
             {
-                _ta = Task.Run((() => TempLoop()));
+                ta = Task.Run((() => TempLoop()));
             }
         }
 
@@ -70,29 +71,14 @@ namespace WCFServiceWebRole1
 
         public Brugere OpretBruger(string brugernavn, string password, string email)
         {
-            bool indeholderIkkeBrugernavn = false;
-            bool indeholderSnabelA = false;
 
             using (DataContext dataContext = new DataContext())
             {
                 Brugere exBruger = FindBruger(brugernavn);
 
-                #region Betingelser
-
-                if (!password.Contains(brugernavn))
+                if (exBruger == null)
                 {
-                    indeholderIkkeBrugernavn = true;
-                }
-                if (email.Contains("@"))
-                {
-                    indeholderSnabelA = true;
-                }
-
-                #endregion
-
-                if (exBruger == null && PasswordTjekker(password) && indeholderIkkeBrugernavn && indeholderSnabelA)
-                {
-                    Brugere b = new Brugere() {Brugernavn = brugernavn, Password = password, Email = email};
+                    Brugere b = new Brugere() { Brugernavn = brugernavn, Password = password, Email = email };
                     dataContext.Brugere.Add(b);
                     dataContext.SaveChanges();
                     return b;
@@ -106,7 +92,7 @@ namespace WCFServiceWebRole1
             using (DataContext dataContext = new DataContext())
             {
                 Brugere b = FindBruger(brugernavn);
-                if (b != null && PasswordTjekker(password) && !password.Contains(b.Brugernavn))
+                if (b != null)
                 {
                     b.Password = password;
                     dataContext.Brugere.AddOrUpdate(b);
@@ -122,7 +108,7 @@ namespace WCFServiceWebRole1
             using (DataContext dataContext = new DataContext())
             {
                 Brugere b = FindBruger(brugernavn);
-                if (b != null && email.Contains("@"))
+                if (b != null)
                 {
                     b.Email = email;
                     dataContext.Brugere.AddOrUpdate(b);
@@ -221,41 +207,6 @@ namespace WCFServiceWebRole1
             }
         }
 
-        private bool PasswordTjekker(string password)
-        {
-            bool laengde = false;
-            bool indeholderTal = false;
-            bool indeholderStortBogstav = false;
-
-            if (password.Length > 3 && password.Length < 21)
-            {
-                laengde = true;
-            }
-            if (password.Contains('1') || password.Contains("2") || password.Contains("3") ||
-                password.Contains('4') || password.Contains("5") || password.Contains("6") ||
-                password.Contains('7') || password.Contains("8") || password.Contains("9"))
-            {
-                indeholderTal = true;
-            }
-            if (password.Contains("A") || password.Contains("B") || password.Contains("C") ||
-                password.Contains("D") || password.Contains("E") || password.Contains("F") ||
-                password.Contains("G") || password.Contains("G") || password.Contains("I") ||
-                password.Contains("J") || password.Contains("K") || password.Contains("L") ||
-                password.Contains("M") || password.Contains("N") || password.Contains("O") ||
-                password.Contains("P") || password.Contains("Q") || password.Contains("R") ||
-                password.Contains("S") || password.Contains("T") || password.Contains("U") ||
-                password.Contains("V") || password.Contains("W") || password.Contains("X") ||
-                password.Contains("Y") || password.Contains("Z") || password.Contains("Æ") ||
-                password.Contains("Ø") || password.Contains("Å"))
-            {
-                indeholderStortBogstav = true;
-            }
-            if (laengde && indeholderTal && indeholderStortBogstav)
-            {
-                return true;
-            }
-            return false;
-        }
 
         private void TempLoop()
         {
@@ -269,8 +220,8 @@ namespace WCFServiceWebRole1
                 //                     "Light Sensor(8bit): 159\r\n" +
                 //                     "Temperature(8bit): 215\r\n" +
                 //                     "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
-                byte[] bytes = _client.Receive(ref _ipAddress);
-                Task.Run(() => DoIt(bytes, ref _lastTemp));
+                byte[] bytes = client.Receive(ref ipAddress);
+                Task.Run(() => DoIt(bytes, ref lastTemp));
                 //Thread.Sleep(1000);
             }
         }
@@ -288,7 +239,7 @@ namespace WCFServiceWebRole1
             using (DataContext dataContext = new DataContext())
             {
                 DateTime tidspunkt = DateTime.Now;
-                dataContext.Bevaegelser.Add(new Bevaegelser() {Temperatur = temp, Tidspunkt = tidspunkt});
+                dataContext.Bevaegelser.Add(new Bevaegelser() { Temperatur = temp, Tidspunkt = tidspunkt });
                 dataContext.SaveChanges();
             }
             lastTemp = temp;

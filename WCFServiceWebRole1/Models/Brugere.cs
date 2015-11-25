@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Web.UI.WebControls;
 
-namespace WCFServiceWebRole1
+namespace WCFServiceWebRole1.Models
 {
     using System;
     using System.Collections.Generic;

@@ -1,4 +1,4 @@
-namespace WCFServiceWebRole1
+namespace WCFServiceWebRole1.Models
 {
     using System;
     using System.Collections.Generic;
@@ -9,7 +9,6 @@ namespace WCFServiceWebRole1
     [Table("Bevaegelser")]
     public partial class Bevaegelser
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         public DateTime Tidspunkt { get; set; }
@@ -23,9 +22,11 @@ namespace WCFServiceWebRole1
             Temperatur = temperatur;
         }
 
+
         public Bevaegelser()
         {
-            
+
         }
     }
+
 }

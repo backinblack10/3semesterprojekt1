@@ -1,4 +1,4 @@
-namespace WCFServiceWebRole1
+namespace WCFServiceWebRole1.Models
 {
     using System;
     using System.Collections.Generic;
@@ -6,8 +6,8 @@ namespace WCFServiceWebRole1
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Tid")]
-    public partial class Tid
+    [Table("Tider")]
+    public partial class Tider
     {
         public int Id { get; set; }
 
