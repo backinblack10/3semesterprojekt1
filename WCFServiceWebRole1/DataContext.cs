@@ -6,14 +6,13 @@ using System.Linq;
 
 namespace WCFServiceWebRole1
 {
-    
 
     public partial class DataContext : DbContext
     {
         public DataContext()
-            : base("name=DataContext5")
+            : base("name=DataContext6")
         {
-            Configuration.ProxyCreationEnabled = false;
+            base.Configuration.ProxyCreationEnabled = false;
         }
 
         public virtual DbSet<Bevaegelser> Bevaegelser { get; set; }
@@ -22,6 +21,10 @@ namespace WCFServiceWebRole1
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Bevaegelser>()
+                .Property(e => e.Tidspunkt)
+                .HasPrecision(0);
+
             modelBuilder.Entity<Bevaegelser>()
                 .Property(e => e.Temperatur)
                 .HasPrecision(4, 2);

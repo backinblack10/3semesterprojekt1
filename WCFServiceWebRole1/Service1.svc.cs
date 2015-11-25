@@ -228,21 +228,21 @@ namespace WCFServiceWebRole1
 
         private static void DoIt(byte[] bytes, ref int lastTemp)
         {
-            string resp = Encoding.ASCII.GetString(bytes);
-            string cut = resp.Split('\r')[6];
-            string cut2 = cut.Split(':')[1];
-            string cut3 = cut2.Split(' ')[1];
-            string cut4 = cut3[0].ToString() + cut3[1].ToString() + "," + cut3[2].ToString();
-            int temp = int.Parse(cut3);
-            //if (lastTemp != temp)
+            //string resp = Encoding.ASCII.GetString(bytes);
+            //string cut = resp.Split('\r')[6];
+            //string cut2 = cut.Split(':')[1];
+            //string cut3 = cut2.Split(' ')[1];
+            //string cut4 = cut3[0].ToString() + cut3[1].ToString() + "," + cut3[2].ToString();
+            //int temp = int.Parse(cut3);
+            ////if (lastTemp != temp)
+            ////{
+            //using (DataContext dataContext = new DataContext())
             //{
-            using (DataContext dataContext = new DataContext())
-            {
-                DateTime tidspunkt = DateTime.Now;
-                dataContext.Bevaegelser.Add(new Bevaegelser() { Temperatur = temp, Tidspunkt = tidspunkt });
-                dataContext.SaveChanges();
-            }
-            lastTemp = temp;
+            //    DateTime tidspunkt = DateTime.Now;
+            //    dataContext.Bevaegelser.Add(new Bevaegelser() { Temperatur = temp, Tidspunkt = tidspunkt });
+            //    dataContext.SaveChanges();
+            //}
+            //lastTemp = temp;
             //}
         }
     }
