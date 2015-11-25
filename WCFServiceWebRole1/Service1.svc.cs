@@ -175,7 +175,7 @@ namespace WCFServiceWebRole1
         {
             // Emailoprettelse
             var email = new SendGridMessage();
-            email.From = new MailAddress("P&P", "Protect and Prevent");
+            email.From = new MailAddress("Service@pp.org", "Protect and Prevent");
             email.AddTo(@"User <" + modtager + ">");
             email.Subject = emne;
             email.Text = besked + "\r\n" + uniktIndhold;
