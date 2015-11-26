@@ -14,9 +14,6 @@ namespace WCFServiceWebRole1
     public interface IService1
     {
         [OperationContract]
-        int GetEntries();
-
-        [OperationContract]
         Bevaegelser SletHistorik(int id);
 
         [OperationContract]
@@ -45,8 +42,5 @@ namespace WCFServiceWebRole1
 
         [OperationContract]
         string GlemtBrugernavn(string email);
-
-        // TODO: Add your service operations here
     }
-   
 }

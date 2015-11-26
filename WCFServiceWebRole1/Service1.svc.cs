@@ -21,38 +21,28 @@ namespace WCFServiceWebRole1
     // NOTE: In order to launch WCF GetCount Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        private static int port = 7000;
-        private static UdpClient client;
-        private static IPEndPoint ipAddress;
-        private static int lastTemp;
-        private static Thread t;
-        private static Task ta;
+        private const int Port = 7000;
+        private static UdpClient _client;
+        private static IPEndPoint _ipAddress;
+        private static int _lastTemp;
+        private static Task _ta;
 
         public Service1()
         {
-            if (client == null)
+            if (_client == null)
             {
-                client = new UdpClient(port) { EnableBroadcast = true };
+                _client = new UdpClient(Port) { EnableBroadcast = true };
             }
-            if (ipAddress == null)
+            if (_ipAddress == null)
             {
-                ipAddress = new IPEndPoint(IPAddress.Any, port);
+                _ipAddress = new IPEndPoint(IPAddress.Any, Port);
             }
 
-            if (ta == null)
+            if (_ta == null)
             {
-                ta = Task.Run((() => TempLoop()));
+                _ta = Task.Run((() => TempLoop()));
             }
         }
-
-        public int GetEntries()
-        {
-            using (DataContext dataContext = new DataContext())
-            {
-                return dataContext.Bevaegelser.Count();
-            }
-        }
-
         public Bevaegelser SletHistorik(int id)
         {
             using (DataContext dataContext = new DataContext())
@@ -67,11 +57,8 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
-
-
         public Brugere OpretBruger(string brugernavn, string password, string email)
         {
-
             using (DataContext dataContext = new DataContext())
             {
                 Brugere exBruger = FindBruger(brugernavn);
@@ -220,8 +207,8 @@ namespace WCFServiceWebRole1
                 //                     "Light Sensor(8bit): 159\r\n" +
                 //                     "Temperature(8bit): 215\r\n" +
                 //                     "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
-                byte[] bytes = client.Receive(ref ipAddress);
-                Task.Run(() => DoIt(bytes, ref lastTemp));
+                byte[] bytes = _client.Receive(ref _ipAddress);
+                Task.Run(() => DoIt(bytes, ref _lastTemp));
                 //Thread.Sleep(1000);
             }
         }
