@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
@@ -111,19 +112,29 @@ namespace WCFServiceWebRole1
             throw new NotImplementedException();
         }
 
-        public IList<Bevaegelser> HentData()
+        public List<Bevaegelser> HentBevægelser()
         {
             throw new NotImplementedException();
         }
 
-        public IList<decimal> HentTemperatur()
+        public int HentTemperatur(int startInterval, int slutInterval)
         {
             throw new NotImplementedException();
         }
 
-        public IList<DateTime> HentTidspunkt()
+        public int HentTidspunkt(int aarstal, int maaned, int slutdag)
         {
-            throw new NotImplementedException();
+            if (aarstal.ToString().Length == 4 && maaned >= 1 && maaned <= 12 && slutdag >= 1 && slutdag <= 31)
+            {
+                DateTime startsDato = new DateTime(aarstal, maaned, 1);
+                DateTime slutsDato = new DateTime(aarstal, maaned, slutdag);
+                using (DataContext dataContext = new DataContext())
+                {
+                    var query = from q in dataContext.Bevaegelser where q.Dato >= startsDato where q.Dato <= slutsDato select q;
+                    return query.Count();
+                }
+            }
+            return 0;
         }
 
         public string GlemtPassword(string brugernavn)
