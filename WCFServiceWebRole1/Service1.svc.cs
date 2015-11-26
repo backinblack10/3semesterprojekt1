@@ -29,6 +29,7 @@ namespace WCFServiceWebRole1
         private static DateTime _senesteDato;
         private static TimeSpan _senesteTid;
         private static Task _ta;
+        private static bool _alarmBool;
 
         public Service1()
         {
@@ -176,7 +177,7 @@ namespace WCFServiceWebRole1
         /// <param name="emne"></param>
         /// <param name="besked"></param>
         /// <param name="uniktIndhold">Så som nyt password eller lign.</param>
-        private void SendEmail(string modtager, string emne, string besked, string uniktIndhold)
+        private void SendEmail(string modtager, string emne, string besked, string uniktIndhold = null)
         {
             // Emailoprettelse
             var email = new SendGridMessage();
@@ -214,6 +215,7 @@ namespace WCFServiceWebRole1
 
         private void TempLoop()
         {
+            Task.Run((() => SetTrue()));
             while (true)
             {
                 //Random r = new Random();
@@ -228,11 +230,20 @@ namespace WCFServiceWebRole1
                 //                     "Movement last detected: 2015 - 10 - 29 09:27:" + r.Next(1,99) + ".001053\r\n";
                 byte[] bytes = _client.Receive(ref _ipAddress);
                 Task.Run(() => DoIt(bytes, ref _senesteDato, ref _senesteTid));
-                //Thread.Sleep(1000);
+                Thread.Sleep(60000);
             }
         }
 
-        private static void DoIt(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
+        private void SetTrue()
+        {
+            while (true)
+            {
+                _alarmBool = true;
+                Thread.Sleep(3600000);
+            }
+        }
+
+        private void DoIt(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
         {
             string resp = Encoding.ASCII.GetString(bytes);
             string movementDetected = resp.Split('\r')[7]; // "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
@@ -264,7 +275,25 @@ namespace WCFServiceWebRole1
                 }
                 dt = senesteDato;
                 ts = senesteTid;
+                if (_alarmBool)
+                {
+                    Alarmer();
+                }
+                
             }
+        }
+
+        private void Alarmer()
+        {
+            using (DataContext dataContext = new DataContext())
+            {
+                foreach (var bruger in dataContext.Brugere)
+                {
+                    SendEmail(bruger.Email, "Indbrud", "Der er indbrud!");
+                }
+                _alarmBool = false;
+            }
+            
         }
     }
 }
