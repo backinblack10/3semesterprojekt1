@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Spatial;
+using System.Runtime.Serialization;
 
 namespace WCFServiceWebRole1.Models
 {
     
 
     [Table("Brugere")]
+    [DataContract]
     public partial class Brugere
     {
         private string _password;
@@ -18,6 +20,7 @@ namespace WCFServiceWebRole1.Models
         private string _brugernavn;
         public int Id { get; set; }
 
+        [DataMember]
         [Required]
         [StringLength(50)]
         public string Brugernavn
@@ -26,6 +29,7 @@ namespace WCFServiceWebRole1.Models
             set { _brugernavn = value; }
         }
 
+        [DataMember]
         [Required]
         [StringLength(100)]
         public string Password
@@ -46,6 +50,7 @@ namespace WCFServiceWebRole1.Models
             }
         }
 
+        [DataMember]
         [Required]
         [StringLength(50)]
         public string Email

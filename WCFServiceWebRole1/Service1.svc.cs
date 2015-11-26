@@ -13,6 +13,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using SendGrid;
 using WCFServiceWebRole1.Models;
 
@@ -25,14 +26,15 @@ namespace WCFServiceWebRole1
         private const int Port = 7000;
         private static UdpClient _client;
         private static IPEndPoint _ipAddress;
-        private static int _lastTemp;
+        private static DateTime _senesteDato;
+        private static TimeSpan _senesteTid;
         private static Task _ta;
 
         public Service1()
         {
             if (_client == null)
             {
-                _client = new UdpClient(Port) { EnableBroadcast = true };
+                _client = new UdpClient(Port) {EnableBroadcast = true};
             }
             if (_ipAddress == null)
             {
@@ -44,6 +46,7 @@ namespace WCFServiceWebRole1
                 _ta = Task.Run((() => TempLoop()));
             }
         }
+
         public Bevaegelser SletHistorik(int id)
         {
             using (DataContext dataContext = new DataContext())
@@ -58,6 +61,7 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
+
         public Brugere OpretBruger(string brugernavn, string password, string email)
         {
             using (DataContext dataContext = new DataContext())
@@ -66,7 +70,7 @@ namespace WCFServiceWebRole1
 
                 if (exBruger == null)
                 {
-                    Brugere b = new Brugere() { Brugernavn = brugernavn, Password = password, Email = email };
+                    Brugere b = new Brugere() {Brugernavn = brugernavn, Password = password, Email = email};
                     dataContext.Brugere.Add(b);
                     dataContext.SaveChanges();
                     return b;
@@ -130,7 +134,10 @@ namespace WCFServiceWebRole1
                 DateTime slutsDato = new DateTime(aarstal, maaned, slutdag);
                 using (DataContext dataContext = new DataContext())
                 {
-                    var query = from q in dataContext.Bevaegelser where q.Dato >= startsDato where q.Dato <= slutsDato select q;
+                    var query = from q in dataContext.Bevaegelser
+                        where q.Dato >= startsDato
+                        where q.Dato <= slutsDato
+                        select q;
                     return query.Count();
                 }
             }
@@ -205,11 +212,12 @@ namespace WCFServiceWebRole1
             }
         }
 
-
         private void TempLoop()
         {
             while (true)
             {
+                //Random r = new Random();
+
                 //string testmessage = "RoomSensor Broadcasting\r\n" +
                 //                     "Location: Teachers room\r\n" +
                 //                     "Platform: Linux - 3.12.28 + -armv6l - with - debian - 7.6\r\n" +
@@ -217,31 +225,46 @@ namespace WCFServiceWebRole1
                 //                     "Potentiometer(8bit): 134\r\n" +
                 //                     "Light Sensor(8bit): 159\r\n" +
                 //                     "Temperature(8bit): 215\r\n" +
-                //                     "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
+                //                     "Movement last detected: 2015 - 10 - 29 09:27:" + r.Next(1,99) + ".001053\r\n";
                 byte[] bytes = _client.Receive(ref _ipAddress);
-                Task.Run(() => DoIt(bytes, ref _lastTemp));
+                Task.Run(() => DoIt(bytes, ref _senesteDato, ref _senesteTid));
                 //Thread.Sleep(1000);
             }
         }
 
-        private static void DoIt(byte[] bytes, ref int lastTemp)
+        private static void DoIt(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
         {
-            //string resp = Encoding.ASCII.GetString(bytes);
-            //string cut = resp.Split('\r')[6];
-            //string cut2 = cut.Split(':')[1];
-            //string cut3 = cut2.Split(' ')[1];
-            //string cut4 = cut3[0].ToString() + cut3[1].ToString() + "," + cut3[2].ToString();
-            //int temp = int.Parse(cut3);
-            ////if (lastTemp != temp)
-            ////{
-            //using (DataContext dataContext = new DataContext())
-            //{
-            //    DateTime tidspunkt = DateTime.Now;
-            //    dataContext.Bevaegelser.Add(new Bevaegelser() { Temperatur = temp, Tidspunkt = tidspunkt });
-            //    dataContext.SaveChanges();
-            //}
-            //lastTemp = temp;
-            //}
+            string resp = Encoding.ASCII.GetString(bytes);
+            string movementDetected = resp.Split('\r')[7]; // "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
+            string dateTimeString = movementDetected.Split(':')[1]; //  2015-10-29 09
+            string[] cutTimeArray = movementDetected.Split(':'); // "[Movement last detected], [2015-10-29 09], [27], [19.001053\r\n]
+            string cutTimeSplit = cutTimeArray[3].Split('.')[0]; // 19
+            string[] cut3 = dateTimeString.Split(' '); // [""] [2015-10-29], [09]
+            string[] cut4 = cut3[1].Split('-');
+            string test = cut4[0];
+            string test2 = cut4[1];
+            DateTime dt = new DateTime(int.Parse(cut4[0]), int.Parse(cut4[1]), int.Parse(cut4[2]));
+            //DateTime ddt = new DateTime(cut3[1], cut3[3], cut3[5]);
+            TimeSpan ts = new TimeSpan(int.Parse(cut3[2]), int.Parse(cutTimeArray[2]), int.Parse(cutTimeSplit));
+            if (senesteDato != dt || senesteTid != ts)
+            {
+                VejrService.GlobalWeatherSoapClient client = new VejrService.GlobalWeatherSoapClient();
+                var response = client.GetWeather("Roskilde", "Denmark");
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(response);
+                XmlNode root = doc.DocumentElement;
+                XmlNode node = root.SelectSingleNode("//Temperature");
+                var nodeSplit = node.InnerText.Split('(')[1];
+                var nodeSplit2 = nodeSplit.Split(' ')[0];
+
+                using (DataContext dataContext = new DataContext())
+                {
+                    dataContext.Bevaegelser.Add(new Bevaegelser(dt, ts, decimal.Parse(nodeSplit2)));
+                    dataContext.SaveChanges();
+                }
+                dt = senesteDato;
+                ts = senesteTid;
+            }
         }
     }
 }
