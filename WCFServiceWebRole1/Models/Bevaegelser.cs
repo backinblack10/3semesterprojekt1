@@ -32,5 +32,10 @@ namespace WCFServiceWebRole1.Models
             Tidspunkt = tidspunkt;
             Temperatur = temperatur;
         }
+
+        public Bevaegelser()
+        {
+            
+        }
     }
 }

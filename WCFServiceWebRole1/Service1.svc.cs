@@ -47,7 +47,6 @@ namespace WCFServiceWebRole1
                 _ta = Task.Run((() => TempLoop()));
             }
         }
-
         public Bevaegelser SletHistorik(int id)
         {
             using (DataContext dataContext = new DataContext())
@@ -62,7 +61,6 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
-
         public Brugere OpretBruger(string brugernavn, string password, string email)
         {
             using (DataContext dataContext = new DataContext())
@@ -79,7 +77,6 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
-
         public Brugere OpdaterPassword(string brugernavn, string password)
         {
             using (DataContext dataContext = new DataContext())
@@ -95,7 +92,6 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
-
         public Brugere OpdaterEmail(string brugernavn, string email)
         {
             using (DataContext dataContext = new DataContext())
@@ -111,22 +107,21 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
-
         public string Login(string brugernavn, string password)
         {
             throw new NotImplementedException();
         }
-
-        public List<Bevaegelser> HentBevægelser()
+        public List<Bevaegelser> HentBevaegelser()
         {
-            throw new NotImplementedException();
+            using (DataContext dataContext = new DataContext())
+            {
+                return dataContext.Bevaegelser.ToList();
+            }
         }
-
         public int HentTemperatur(int startInterval, int slutInterval)
         {
             throw new NotImplementedException();
         }
-
         public int HentTidspunkt(int aarstal, int maaned, int slutdag)
         {
             if (aarstal.ToString().Length == 4 && maaned >= 1 && maaned <= 12 && slutdag >= 1 && slutdag <= 31)
@@ -144,7 +139,6 @@ namespace WCFServiceWebRole1
             }
             return 0;
         }
-
         public string GlemtPassword(string brugernavn)
         {
             throw new NotImplementedException();

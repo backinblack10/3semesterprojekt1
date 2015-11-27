@@ -29,7 +29,7 @@ namespace WCFServiceWebRole1
         string Login(string brugernavn, string password); //string -> Brugere så vi kan gemme email
 
         [OperationContract]
-        List<Bevaegelser> HentBevægelser();
+        List<Bevaegelser> HentBevaegelser();
             
         [OperationContract]
         int HentTemperatur(int startInterval, int slutInterval);
