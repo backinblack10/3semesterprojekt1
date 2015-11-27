@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,6 +42,7 @@ namespace WCFServiceWebRole1
                 _ta = Task.Run((() => SensorLoop()));
             }
         }
+
         public Bevaegelser SletHistorik(int id)
         {
             using (DataContext dataContext = new DataContext())
@@ -60,7 +57,7 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
-        public Brugere OpretBruger(string brugernavn, string password, string email)
+        public string OpretBruger(string brugernavn, string password, string email)
         {
             using (DataContext dataContext = new DataContext())
             {
@@ -68,12 +65,19 @@ namespace WCFServiceWebRole1
 
                 if (exBruger == null)
                 {
-                    Brugere b = new Brugere() {Brugernavn = brugernavn, Password = password, Email = email};
-                    dataContext.Brugere.Add(b);
-                    dataContext.SaveChanges();
-                    return b;
+                    try
+                    {
+                        Brugere b = new Brugere() {Brugernavn = brugernavn, Password = password, Email = email};
+                        dataContext.Brugere.Add(b);
+                        dataContext.SaveChanges();
+                        return brugernavn + " er oprettet i databasen";
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return ex.Message;
+                    }
                 }
-                return null;
+                return "Brugernavnet findes allerede i databasen";
             }
         }
 
@@ -83,19 +87,27 @@ namespace WCFServiceWebRole1
         /// <param name="brugernavn"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public Brugere OpdaterPassword(string brugernavn, string password)
+        public string OpdaterPassword(string brugernavn, string password)
         {
             using (DataContext dataContext = new DataContext())
             {
                 Brugere b = FindBruger(brugernavn);
                 if (b != null)
                 {
+                    try
+                    {
                     b.Password = password;
                     dataContext.Brugere.AddOrUpdate(b);
                     dataContext.SaveChanges();
-                    return b;
+                    return "Password er ændret";
+                    }
+                    catch (ArgumentException ex)
+                    {
+
+                        return ex.Message;
+                    }
                 }
-                return null;
+                return "Der gik noget galt med at finde din bruger. Prøv igen";
             }
         }
 
@@ -105,21 +117,31 @@ namespace WCFServiceWebRole1
         /// <param name="brugernavn"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Brugere OpdaterEmail(string brugernavn, string email)
+        public string OpdaterEmail(string brugernavn, string email)
         {
             using (DataContext dataContext = new DataContext())
             {
                 Brugere b = FindBruger(brugernavn);
                 if (b != null)
                 {
+                    try
+                    {
+
+                    
                     b.Email = email;
                     dataContext.Brugere.AddOrUpdate(b);
                     dataContext.SaveChanges();
-                    return b;
+                        return "Email er ændret";
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return ex.Message;
+                    }
                 }
-                return null;
+                return "Der gik noget galt med at finde din bruger. Prøv igen";
             }
         }
+
         public string Login(string brugernavn, string password)
         {
             throw new NotImplementedException();
@@ -136,6 +158,7 @@ namespace WCFServiceWebRole1
                 return dataContext.Bevaegelser.ToList();
             }
         }
+
         public int HentTemperatur(int startInterval, int slutInterval)
         {
             throw new NotImplementedException();
@@ -165,6 +188,7 @@ namespace WCFServiceWebRole1
             }
             return 0;
         }
+
         public string GlemtPassword(string brugernavn)
         {
             throw new NotImplementedException();
@@ -189,11 +213,11 @@ namespace WCFServiceWebRole1
             }
             return "Email eksisterer ikke i databasen";
         }
+
         private void SendEmail(string modtager, string emne, string besked, string uniktIndhold = null)
         {
             // Emailoprettelse
-            var email = new SendGridMessage();
-            email.From = new MailAddress("Service@pp.org", "Protect and Prevent");
+            var email = new SendGridMessage {From = new MailAddress("Service@pp.org", "Protect and Prevent")};
             email.AddTo(@"User <" + modtager + ">");
             email.Subject = emne;
             email.Text = besked + "\r\n" + uniktIndhold;
@@ -203,8 +227,11 @@ namespace WCFServiceWebRole1
             var pswd = "WB0uAl6moFYfCtc";
             var credentials = new NetworkCredential(username, pswd);
             var transportWeb = new Web(credentials);
+#pragma warning disable 4014
             transportWeb.DeliverAsync(email);
+#pragma warning restore 4014
         }
+
         private Brugere FindBruger(string brugernavn = null, int id = 0, string email = null)
         {
             using (DataContext dataContext = new DataContext())
@@ -223,6 +250,8 @@ namespace WCFServiceWebRole1
                 return br;
             }
         }
+
+        [SuppressMessage("ReSharper", "FunctionNeverReturns")]
         private void SensorLoop()
         {
             Task.Run((() => SetTrue()));
@@ -232,8 +261,6 @@ namespace WCFServiceWebRole1
                 {
                     if (DateTime.Now.Hour < 17 && DateTime.Now.Hour > 8)
                     {
-
-
                         //Random r = new Random();
 
                         //string testmessage = "RoomSensor Broadcasting\r\n" +
@@ -252,6 +279,7 @@ namespace WCFServiceWebRole1
                 }
             }
         }
+
         private void SetTrue()
         {
             while (true)
@@ -260,25 +288,23 @@ namespace WCFServiceWebRole1
                 Thread.Sleep(3600000);
             }
         }
+
         private void DataBehandling(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
         {
             string resp = Encoding.ASCII.GetString(bytes);
-            string movementDetected = resp.Split('\r')[7]; // "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
+            string movementDetected = resp.Split('\r')[7];          // "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
             string dateTimeString = movementDetected.Split(':')[1]; //  2015-10-29 09
-            string[] cutTimeArray = movementDetected.Split(':'); // "[Movement last detected], [2015-10-29 09], [27], [19.001053\r\n]
-            string cutTimeSplit = cutTimeArray[3].Split('.')[0]; // 19
-            string[] cut3 = dateTimeString.Split(' '); // [""] [2015-10-29], [09]
+            string[] cutTimeArray = movementDetected.Split(':');    // "[Movement last detected], [2015-10-29 09], [27], [19.001053\r\n]
+            string cutTimeSplit = cutTimeArray[3].Split('.')[0];    // 19
+            string[] cut3 = dateTimeString.Split(' ');              // [""] [2015-10-29], [09]
             string[] cut4 = cut3[1].Split('-');
-            string test = cut4[0];
-            string test2 = cut4[1];
             DateTime dt = new DateTime(int.Parse(cut4[0]), int.Parse(cut4[1]), int.Parse(cut4[2]));
-            //DateTime ddt = new DateTime(cut3[1], cut3[3], cut3[5]);
             TimeSpan ts = new TimeSpan(int.Parse(cut3[2]), int.Parse(cutTimeArray[2]), int.Parse(cutTimeSplit));
             if (senesteDato != dt || senesteTid != ts)
             {
                 VejrService.GlobalWeatherSoapClient client = new VejrService.GlobalWeatherSoapClient();
                 var response = client.GetWeather("Roskilde", "Denmark");
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml(response);
                 XmlNode root = doc.DocumentElement;
                 XmlNode node = root.SelectSingleNode("//Temperature");
@@ -296,9 +322,9 @@ namespace WCFServiceWebRole1
                 {
                     Alarmer();
                 }
-                
             }
         }
+
         private void Alarmer()
         {
             using (DataContext dataContext = new DataContext())
@@ -309,7 +335,6 @@ namespace WCFServiceWebRole1
                 }
                 _alarmBool = false;
             }
-            
         }
     }
 }

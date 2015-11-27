@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using System.ServiceModel;
-using System.ServiceModel.Web;
-using System.Text;
 using WCFServiceWebRole1.Models;
 
 namespace WCFServiceWebRole1
@@ -17,13 +12,13 @@ namespace WCFServiceWebRole1
         Bevaegelser SletHistorik(int id);
 
         [OperationContract]
-        Brugere OpretBruger(string brugernavn, string password, string email);
+        string OpretBruger(string brugernavn, string password, string email);
 
         [OperationContract]
-        Brugere OpdaterPassword(string brugernavn, string password);
+        string OpdaterPassword(string brugernavn, string password);
 
         [OperationContract]
-        Brugere OpdaterEmail(string brugernavn, string email);
+        string OpdaterEmail(string brugernavn, string email);
 
         [OperationContract]
         string Login(string brugernavn, string password); //string -> Brugere så vi kan gemme email
