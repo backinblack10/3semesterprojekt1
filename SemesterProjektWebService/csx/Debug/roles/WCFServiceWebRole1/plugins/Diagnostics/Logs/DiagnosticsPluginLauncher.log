@@ -1,14 +1,14 @@
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Emulator config file set to C:\Users\Selzamouri\Documents\GitHub\3semesterprojekt1\SemesterProjektWebService\csx\Debug\roles\WCFServiceWebRole1\approot\diagnostics.wadcfgx
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] DiagnosticsStoreRootPath set to: C:\Users\Selzamouri\AppData\Local\dftmp\Resources\4d96ad15-a003-4fa7-9a75-52104754ac03
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Loading config file: C:\Users\Selzamouri\Documents\GitHub\3semesterprojekt1\SemesterProjektWebService\csx\Debug\roles\WCFServiceWebRole1\approot\diagnostics.wadcfgx
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Checking VM Type
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Emulator config file set to C:\Users\Selzamouri\Documents\GitHub\3semesterprojekt1\SemesterProjektWebService\csx\Debug\roles\WCFServiceWebRole1\approot\diagnostics.wadcfgx
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Extension set to Emulator Mode
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Reading XML configuration file
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Bypassing private config decryption
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Stopping the running plugin, if any
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] No DiagnosticsPlugin is running.
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Killing any DiagnosticsPlugin that might remain.
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Killing any MonAgentHost that might remain.
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Diagnostics plugin stopped successfully
-DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 08:13:48] Resetting DiagnosticPlugin
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Emulator config file set to C:\Users\Selzamouri\Documents\GitHub\3semesterprojekt1\SemesterProjektWebService\csx\Debug\roles\WCFServiceWebRole1\approot\diagnostics.wadcfgx
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] DiagnosticsStoreRootPath set to: C:\Users\Selzamouri\AppData\Local\dftmp\Resources\9e80910b-fbaf-4ba7-b3b3-2e74956670f7
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Loading config file: C:\Users\Selzamouri\Documents\GitHub\3semesterprojekt1\SemesterProjektWebService\csx\Debug\roles\WCFServiceWebRole1\approot\diagnostics.wadcfgx
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Checking VM Type
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Emulator config file set to C:\Users\Selzamouri\Documents\GitHub\3semesterprojekt1\SemesterProjektWebService\csx\Debug\roles\WCFServiceWebRole1\approot\diagnostics.wadcfgx
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Extension set to Emulator Mode
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Reading XML configuration file
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Bypassing private config decryption
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Stopping the running plugin, if any
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] No DiagnosticsPlugin is running.
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Killing any DiagnosticsPlugin that might remain.
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Killing any MonAgentHost that might remain.
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Diagnostics plugin stopped successfully
+DiagnosticsPluginLauncher.exe Information: 0 : [27-11-2015 09:32:07] Resetting DiagnosticPlugin

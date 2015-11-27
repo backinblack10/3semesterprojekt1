@@ -41,10 +41,9 @@ namespace WCFServiceWebRole1
             {
                 _ipAddress = new IPEndPoint(IPAddress.Any, Port);
             }
-
             if (_ta == null)
             {
-                _ta = Task.Run((() => TempLoop()));
+                _ta = Task.Run((() => SensorLoop()));
             }
         }
         public Bevaegelser SletHistorik(int id)
@@ -77,6 +76,13 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
+
+        /// <summary>
+        /// Opdatere den pågældende brugers password til det skrevne password
+        /// </summary>
+        /// <param name="brugernavn"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public Brugere OpdaterPassword(string brugernavn, string password)
         {
             using (DataContext dataContext = new DataContext())
@@ -92,6 +98,13 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
+
+        /// <summary>
+        /// Opdatere den pågældende brugers email til den skrevne email
+        /// </summary>
+        /// <param name="brugernavn"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public Brugere OpdaterEmail(string brugernavn, string email)
         {
             using (DataContext dataContext = new DataContext())
@@ -111,6 +124,11 @@ namespace WCFServiceWebRole1
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Henter alle bevaegelser
+        /// </summary>
+        /// <returns></returns>
         public List<Bevaegelser> HentBevaegelser()
         {
             using (DataContext dataContext = new DataContext())
@@ -122,6 +140,14 @@ namespace WCFServiceWebRole1
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Henter bevaegelser i det skrevne interval
+        /// </summary>
+        /// <param name="aarstal"></param>
+        /// <param name="maaned"></param>
+        /// <param name="slutdag"></param>
+        /// <returns></returns>
         public int HentTidspunkt(int aarstal, int maaned, int slutdag)
         {
             if (aarstal.ToString().Length == 4 && maaned >= 1 && maaned <= 12 && slutdag >= 1 && slutdag <= 31)
@@ -163,14 +189,6 @@ namespace WCFServiceWebRole1
             }
             return "Email eksisterer ikke i databasen";
         }
-
-        /// <summary>
-        /// Sender email med de pågældende parametre
-        /// </summary>
-        /// <param name="modtager"></param> 
-        /// <param name="emne"></param>
-        /// <param name="besked"></param>
-        /// <param name="uniktIndhold">Så som nyt password eller lign.</param>
         private void SendEmail(string modtager, string emne, string besked, string uniktIndhold = null)
         {
             // Emailoprettelse
@@ -187,7 +205,6 @@ namespace WCFServiceWebRole1
             var transportWeb = new Web(credentials);
             transportWeb.DeliverAsync(email);
         }
-
         private Brugere FindBruger(string brugernavn = null, int id = 0, string email = null)
         {
             using (DataContext dataContext = new DataContext())
@@ -206,28 +223,35 @@ namespace WCFServiceWebRole1
                 return br;
             }
         }
-
-        private void TempLoop()
+        private void SensorLoop()
         {
             Task.Run((() => SetTrue()));
-            while (true)
+            using (DataContext dataContext = new DataContext())
             {
-                //Random r = new Random();
+                while (true)
+                {
+                    if (DateTime.Now.Hour < 17 && DateTime.Now.Hour > 8)
+                    {
 
-                //string testmessage = "RoomSensor Broadcasting\r\n" +
-                //                     "Location: Teachers room\r\n" +
-                //                     "Platform: Linux - 3.12.28 + -armv6l - with - debian - 7.6\r\n" +
-                //                     "Machine: armv6l\r\n" +
-                //                     "Potentiometer(8bit): 134\r\n" +
-                //                     "Light Sensor(8bit): 159\r\n" +
-                //                     "Temperature(8bit): 215\r\n" +
-                //                     "Movement last detected: 2015 - 10 - 29 09:27:" + r.Next(1,99) + ".001053\r\n";
-                byte[] bytes = _client.Receive(ref _ipAddress);
-                Task.Run(() => DoIt(bytes, ref _senesteDato, ref _senesteTid));
-                Thread.Sleep(60000);
+
+                        //Random r = new Random();
+
+                        //string testmessage = "RoomSensor Broadcasting\r\n" +
+                        //                     "Location: Teachers room\r\n" +
+                        //                     "Platform: Linux - 3.12.28 + -armv6l - with - debian - 7.6\r\n" +
+                        //                     "Machine: armv6l\r\n" +
+                        //                     "Potentiometer(8bit): 134\r\n" +
+                        //                     "Light Sensor(8bit): 159\r\n" +
+                        //                     "Temperature(8bit): 215\r\n" +
+                        //                     "Movement last detected: 2015 - 10 - 29 09:27:" + r.Next(1,99) + ".001053\r\n";
+                        //byte[] staticBytes = Encoding.ASCII.GetBytes(testmessage);
+                        byte[] bytes = _client.Receive(ref _ipAddress);
+                        Task.Run(() => DataBehandling(bytes, ref _senesteDato, ref _senesteTid));
+                        Thread.Sleep(60000);
+                    }
+                }
             }
         }
-
         private void SetTrue()
         {
             while (true)
@@ -236,8 +260,7 @@ namespace WCFServiceWebRole1
                 Thread.Sleep(3600000);
             }
         }
-
-        private void DoIt(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
+        private void DataBehandling(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
         {
             string resp = Encoding.ASCII.GetString(bytes);
             string movementDetected = resp.Split('\r')[7]; // "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
@@ -276,7 +299,6 @@ namespace WCFServiceWebRole1
                 
             }
         }
-
         private void Alarmer()
         {
             using (DataContext dataContext = new DataContext())
