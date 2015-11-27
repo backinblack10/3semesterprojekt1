@@ -57,6 +57,14 @@ namespace WCFServiceWebRole1
                 return null;
             }
         }
+
+        /// <summary>
+        /// Opretter en bruger med de pågældende parametre
+        /// </summary>
+        /// <param name="brugernavn"></param>
+        /// <param name="password"></param>
+        /// <param name="email"></param>
+        /// <returns>string med resultat</returns>
         public string OpretBruger(string brugernavn, string password, string email)
         {
             using (DataContext dataContext = new DataContext())
@@ -86,7 +94,7 @@ namespace WCFServiceWebRole1
         /// </summary>
         /// <param name="brugernavn"></param>
         /// <param name="password"></param>
-        /// <returns></returns>
+        /// <returns>string med resultat</returns>
         public string OpdaterPassword(string brugernavn, string password)
         {
             using (DataContext dataContext = new DataContext())
@@ -116,7 +124,7 @@ namespace WCFServiceWebRole1
         /// </summary>
         /// <param name="brugernavn"></param>
         /// <param name="email"></param>
-        /// <returns></returns>
+        /// <returns>string med resultat</returns>
         public string OpdaterEmail(string brugernavn, string email)
         {
             using (DataContext dataContext = new DataContext())
@@ -141,7 +149,7 @@ namespace WCFServiceWebRole1
                 return "Der gik noget galt med at finde din bruger. Prøv igen";
             }
         }
-
+        
         public string Login(string brugernavn, string password)
         {
             throw new NotImplementedException();
@@ -150,7 +158,7 @@ namespace WCFServiceWebRole1
         /// <summary>
         /// Henter alle bevaegelser
         /// </summary>
-        /// <returns></returns>
+        /// <returns>En liste med alle bevægelser</returns>
         public List<Bevaegelser> HentBevaegelser()
         {
             using (DataContext dataContext = new DataContext())
@@ -165,12 +173,12 @@ namespace WCFServiceWebRole1
         }
 
         /// <summary>
-        /// Henter bevaegelser i det skrevne interval
+        /// Henter bevægelser i det skrevne interval
         /// </summary>
         /// <param name="aarstal"></param>
         /// <param name="maaned"></param>
         /// <param name="slutdag"></param>
-        /// <returns></returns>
+        /// <returns>int med antal bevægelser</returns>
         public int HentTidspunkt(int aarstal, int maaned, int slutdag)
         {
             if (aarstal.ToString().Length == 4 && maaned >= 1 && maaned <= 12 && slutdag >= 1 && slutdag <= 31)
@@ -198,7 +206,7 @@ namespace WCFServiceWebRole1
         /// Genfinder brugernavn ud fra email
         /// </summary>
         /// <param name="email"></param>
-        /// <returns></returns>
+        /// <returns>string med resultat</returns>
         public string GlemtBrugernavn(string email)
         {
             Brugere b = FindBruger(null, 0, email);
@@ -231,7 +239,6 @@ namespace WCFServiceWebRole1
             transportWeb.DeliverAsync(email);
 #pragma warning restore 4014
         }
-
         private Brugere FindBruger(string brugernavn = null, int id = 0, string email = null)
         {
             using (DataContext dataContext = new DataContext())
@@ -250,7 +257,6 @@ namespace WCFServiceWebRole1
                 return br;
             }
         }
-
         [SuppressMessage("ReSharper", "FunctionNeverReturns")]
         private void SensorLoop()
         {
@@ -279,7 +285,6 @@ namespace WCFServiceWebRole1
                 }
             }
         }
-
         private void SetTrue()
         {
             while (true)
@@ -288,7 +293,6 @@ namespace WCFServiceWebRole1
                 Thread.Sleep(3600000);
             }
         }
-
         private void DataBehandling(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
         {
             string resp = Encoding.ASCII.GetString(bytes);
@@ -324,7 +328,6 @@ namespace WCFServiceWebRole1
                 }
             }
         }
-
         private void Alarmer()
         {
             using (DataContext dataContext = new DataContext())
