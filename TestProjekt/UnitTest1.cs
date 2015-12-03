@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TestProjekt.ServiceReference1;
 using WCFServiceWebRole1;
+using WCFServiceWebRole1.Models;
 
 namespace TestProjekt
 {
@@ -57,6 +59,14 @@ namespace TestProjekt
         public void TestEmail()
         {
             b.Email = "Meile.com";
+        }
+
+        [TestMethod]
+        public void Opdateremailintegrationtest()
+        {
+            Service1Client client = new Service1Client();
+            //client.OpdaterEmail("Jari", "dinp67.com");
+            Assert.AreEqual("Email er forkert" + " (" + "dinp67.com" + ")", client.OpdaterEmail("Jari", "dinp67.com"));
         }
     }
 }

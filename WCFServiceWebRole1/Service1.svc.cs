@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Sockets;
-using System.Runtime.Serialization;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using SendGrid;
+using WCFServiceWebRole1.Models;
 
 namespace WCFServiceWebRole1
 {
@@ -23,9 +22,10 @@ namespace WCFServiceWebRole1
         private const int Port = 7000;
         private static UdpClient _client;
         private static IPEndPoint _ipAddress;
-        private static int _lastTemp;
-        private static Thread _t;
+        private static DateTime _senesteDato;
+        private static TimeSpan _senesteTid;
         private static Task _ta;
+        private static bool _alarmBool;
 
         public Service1()
         {
@@ -37,18 +37,9 @@ namespace WCFServiceWebRole1
             {
                 _ipAddress = new IPEndPoint(IPAddress.Any, Port);
             }
-
             if (_ta == null)
             {
-                _ta = Task.Run((() => TempLoop()));
-            }
-        }
-
-        public int GetEntries()
-        {
-            using (DataContext dataContext = new DataContext())
-            {
-                return dataContext.Bevaegelser.Count();
+                _ta = Task.Run((() => SensorLoop()));
             }
         }
 
@@ -67,90 +58,143 @@ namespace WCFServiceWebRole1
             }
         }
 
-
-        public Brugere OpretBruger(string brugernavn, string password, string email)
+        /// <summary>
+        /// Opretter en bruger med de pågældende parametre
+        /// </summary>
+        /// <param name="brugernavn"></param>
+        /// <param name="password"></param>
+        /// <param name="email"></param>
+        /// <returns>string med resultat</returns>
+        public string OpretBruger(string brugernavn, string password, string email)
         {
-            bool indeholderIkkeBrugernavn = false;
-            bool indeholderSnabelA = false;
-
             using (DataContext dataContext = new DataContext())
             {
                 Brugere exBruger = FindBruger(brugernavn);
 
-                #region Betingelser
-
-                if (!password.Contains(brugernavn))
+                if (exBruger == null)
                 {
-                    indeholderIkkeBrugernavn = true;
+                    try
+                    {
+                        Brugere b = new Brugere() {Brugernavn = brugernavn, Password = password, Email = email};
+                        dataContext.Brugere.Add(b);
+                        dataContext.SaveChanges();
+                        return brugernavn + " er oprettet i databasen";
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return ex.Message;
+                    }
                 }
-                if (email.Contains("@"))
-                {
-                    indeholderSnabelA = true;
-                }
-
-                #endregion
-
-                if (exBruger == null && PasswordTjekker(password) && indeholderIkkeBrugernavn && indeholderSnabelA)
-                {
-                    Brugere b = new Brugere() {Brugernavn = brugernavn, Password = password, Email = email};
-                    dataContext.Brugere.Add(b);
-                    dataContext.SaveChanges();
-                    return b;
-                }
-                return null;
+                return "Brugernavnet findes allerede i databasen";
             }
         }
 
-        public Brugere OpdaterPassword(string brugernavn, string password)
+        /// <summary>
+        /// Opdatere den pågældende brugers password til det skrevne password
+        /// </summary>
+        /// <param name="brugernavn"></param>
+        /// <param name="password"></param>
+        /// <returns>string med resultat</returns>
+        public string OpdaterPassword(string brugernavn, string password)
         {
             using (DataContext dataContext = new DataContext())
             {
                 Brugere b = FindBruger(brugernavn);
-                if (b != null && PasswordTjekker(password) && !password.Contains(b.Brugernavn))
+                if (b != null)
                 {
+                    try
+                    {
                     b.Password = password;
                     dataContext.Brugere.AddOrUpdate(b);
                     dataContext.SaveChanges();
-                    return b;
+                    return "Password er ændret";
+                    }
+                    catch (ArgumentException ex)
+                    {
+
+                        return ex.Message;
+                    }
                 }
-                return null;
+                return "Der gik noget galt med at finde din bruger. Prøv igen";
             }
         }
 
-        public Brugere OpdaterEmail(string brugernavn, string email)
+        /// <summary>
+        /// Opdatere den pågældende brugers email til den skrevne email
+        /// </summary>
+        /// <param name="brugernavn"></param>
+        /// <param name="email"></param>
+        /// <returns>string med resultat</returns>
+        public string OpdaterEmail(string brugernavn, string email)
         {
             using (DataContext dataContext = new DataContext())
             {
                 Brugere b = FindBruger(brugernavn);
-                if (b != null && email.Contains("@"))
+                if (b != null)
                 {
+                    try
+                    {
+
+                    
                     b.Email = email;
                     dataContext.Brugere.AddOrUpdate(b);
                     dataContext.SaveChanges();
-                    return b;
+                        return "Email er ændret";
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return ex.Message;
+                    }
                 }
-                return null;
+                return "Der gik noget galt med at finde din bruger. Prøv igen";
             }
         }
-
+        
         public string Login(string brugernavn, string password)
         {
             throw new NotImplementedException();
         }
 
-        public IList<Bevaegelser> HentData()
+        /// <summary>
+        /// Henter alle bevaegelser
+        /// </summary>
+        /// <returns>En liste med alle bevægelser</returns>
+        public List<Bevaegelser> HentBevaegelser()
+        {
+            using (DataContext dataContext = new DataContext())
+            {
+                return dataContext.Bevaegelser.ToList();
+            }
+        }
+
+        public int HentTemperatur(int startInterval, int slutInterval)
         {
             throw new NotImplementedException();
         }
 
-        public IList<decimal> HentTemperatur()
+        /// <summary>
+        /// Henter bevægelser i det skrevne interval
+        /// </summary>
+        /// <param name="aarstal"></param>
+        /// <param name="maaned"></param>
+        /// <param name="slutdag"></param>
+        /// <returns>int med antal bevægelser</returns>
+        public int HentTidspunkt(int aarstal, int maaned, int slutdag)
         {
-            throw new NotImplementedException();
-        }
-
-        public IList<DateTime> HentTidspunkt()
-        {
-            throw new NotImplementedException();
+            if (aarstal.ToString().Length == 4 && maaned >= 1 && maaned <= 12 && slutdag >= 1 && slutdag <= 31)
+            {
+                DateTime startsDato = new DateTime(aarstal, maaned, 1);
+                DateTime slutsDato = new DateTime(aarstal, maaned, slutdag);
+                using (DataContext dataContext = new DataContext())
+                {
+                    var query = from q in dataContext.Bevaegelser
+                        where q.Dato >= startsDato
+                        where q.Dato <= slutsDato
+                        select q;
+                    return query.Count();
+                }
+            }
+            return 0;
         }
 
         public string GlemtPassword(string brugernavn)
@@ -162,7 +206,7 @@ namespace WCFServiceWebRole1
         /// Genfinder brugernavn ud fra email
         /// </summary>
         /// <param name="email"></param>
-        /// <returns></returns>
+        /// <returns>string med resultat</returns>
         public string GlemtBrugernavn(string email)
         {
             Brugere b = FindBruger(null, 0, email);
@@ -178,18 +222,10 @@ namespace WCFServiceWebRole1
             return "Email eksisterer ikke i databasen";
         }
 
-        /// <summary>
-        /// Sender email med de pågældende parametre
-        /// </summary>
-        /// <param name="modtager"></param> 
-        /// <param name="emne"></param>
-        /// <param name="besked"></param>
-        /// <param name="uniktIndhold">Så som nyt password eller lign.</param>
-        private void SendEmail(string modtager, string emne, string besked, string uniktIndhold)
+        private void SendEmail(string modtager, string emne, string besked, string uniktIndhold = null)
         {
             // Emailoprettelse
-            var email = new SendGridMessage();
-            email.From = new MailAddress("P&P", "Protect and Prevent");
+            var email = new SendGridMessage {From = new MailAddress("Service@pp.org", "Protect and Prevent")};
             email.AddTo(@"User <" + modtager + ">");
             email.Subject = emne;
             email.Text = besked + "\r\n" + uniktIndhold;
@@ -199,9 +235,10 @@ namespace WCFServiceWebRole1
             var pswd = "WB0uAl6moFYfCtc";
             var credentials = new NetworkCredential(username, pswd);
             var transportWeb = new Web(credentials);
+#pragma warning disable 4014
             transportWeb.DeliverAsync(email);
+#pragma warning restore 4014
         }
-
         private Brugere FindBruger(string brugernavn = null, int id = 0, string email = null)
         {
             using (DataContext dataContext = new DataContext())
@@ -220,79 +257,87 @@ namespace WCFServiceWebRole1
                 return br;
             }
         }
-
-        private bool PasswordTjekker(string password)
+        [SuppressMessage("ReSharper", "FunctionNeverReturns")]
+        private void SensorLoop()
         {
-            bool laengde = false;
-            bool indeholderTal = false;
-            bool indeholderStortBogstav = false;
+            Task.Run((() => SetTrue()));
+            using (DataContext dataContext = new DataContext())
+            {
+                while (true)
+                {
+                    if (DateTime.Now.Hour < 17 && DateTime.Now.Hour > 8)
+                    {
+                        //Random r = new Random();
 
-            if (password.Length > 3 && password.Length < 21)
-            {
-                laengde = true;
+                        //string testmessage = "RoomSensor Broadcasting\r\n" +
+                        //                     "Location: Teachers room\r\n" +
+                        //                     "Platform: Linux - 3.12.28 + -armv6l - with - debian - 7.6\r\n" +
+                        //                     "Machine: armv6l\r\n" +
+                        //                     "Potentiometer(8bit): 134\r\n" +
+                        //                     "Light Sensor(8bit): 159\r\n" +
+                        //                     "Temperature(8bit): 215\r\n" +
+                        //                     "Movement last detected: 2015 - 10 - 29 09:27:" + r.Next(1,99) + ".001053\r\n";
+                        //byte[] staticBytes = Encoding.ASCII.GetBytes(testmessage);
+                        byte[] bytes = _client.Receive(ref _ipAddress);
+                        Task.Run(() => DataBehandling(bytes, ref _senesteDato, ref _senesteTid));
+                        Thread.Sleep(60000);
+                    }
+                }
             }
-            if (password.Contains('1') || password.Contains("2") || password.Contains("3") ||
-                password.Contains('4') || password.Contains("5") || password.Contains("6") ||
-                password.Contains('7') || password.Contains("8") || password.Contains("9"))
-            {
-                indeholderTal = true;
-            }
-            if (password.Contains("A") || password.Contains("B") || password.Contains("C") ||
-                password.Contains("D") || password.Contains("E") || password.Contains("F") ||
-                password.Contains("G") || password.Contains("G") || password.Contains("I") ||
-                password.Contains("J") || password.Contains("K") || password.Contains("L") ||
-                password.Contains("M") || password.Contains("N") || password.Contains("O") ||
-                password.Contains("P") || password.Contains("Q") || password.Contains("R") ||
-                password.Contains("S") || password.Contains("T") || password.Contains("U") ||
-                password.Contains("V") || password.Contains("W") || password.Contains("X") ||
-                password.Contains("Y") || password.Contains("Z") || password.Contains("Æ") ||
-                password.Contains("Ø") || password.Contains("Å"))
-            {
-                indeholderStortBogstav = true;
-            }
-            if (laengde && indeholderTal && indeholderStortBogstav)
-            {
-                return true;
-            }
-            return false;
         }
-
-        private void TempLoop()
+        private void SetTrue()
         {
             while (true)
             {
-                //string testmessage = "RoomSensor Broadcasting\r\n" +
-                //                     "Location: Teachers room\r\n" +
-                //                     "Platform: Linux - 3.12.28 + -armv6l - with - debian - 7.6\r\n" +
-                //                     "Machine: armv6l\r\n" +
-                //                     "Potentiometer(8bit): 134\r\n" +
-                //                     "Light Sensor(8bit): 159\r\n" +
-                //                     "Temperature(8bit): 215\r\n" +
-                //                     "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
-                byte[] bytes = _client.Receive(ref _ipAddress);
-                Task.Run(() => DoIt(bytes, ref _lastTemp));
-                //Thread.Sleep(1000);
+                _alarmBool = true;
+                Thread.Sleep(3600000);
             }
         }
-
-        private static void DoIt(byte[] bytes, ref int lastTemp)
+        private void DataBehandling(byte[] bytes, ref DateTime senesteDato, ref TimeSpan senesteTid)
         {
             string resp = Encoding.ASCII.GetString(bytes);
-            string cut = resp.Split('\r')[6];
-            string cut2 = cut.Split(':')[1];
-            string cut3 = cut2.Split(' ')[1];
-            string cut4 = cut3[0].ToString() + cut3[1].ToString() + "," + cut3[2].ToString();
-            int temp = int.Parse(cut3);
-            //if (lastTemp != temp)
-            //{
+            string movementDetected = resp.Split('\r')[7];          // "Movement last detected: 2015 - 10 - 29 09:27:19.001053\r\n";
+            string dateTimeString = movementDetected.Split(':')[1]; //  2015-10-29 09
+            string[] cutTimeArray = movementDetected.Split(':');    // "[Movement last detected], [2015-10-29 09], [27], [19.001053\r\n]
+            string cutTimeSplit = cutTimeArray[3].Split('.')[0];    // 19
+            string[] cut3 = dateTimeString.Split(' ');              // [""] [2015-10-29], [09]
+            string[] cut4 = cut3[1].Split('-');
+            DateTime dt = new DateTime(int.Parse(cut4[0]), int.Parse(cut4[1]), int.Parse(cut4[2]));
+            TimeSpan ts = new TimeSpan(int.Parse(cut3[2]), int.Parse(cutTimeArray[2]), int.Parse(cutTimeSplit));
+            if (senesteDato != dt || senesteTid != ts)
+            {
+                VejrService.GlobalWeatherSoapClient client = new VejrService.GlobalWeatherSoapClient();
+                var response = client.GetWeather("Roskilde", "Denmark");
+                var doc = new XmlDocument();
+                doc.LoadXml(response);
+                XmlNode root = doc.DocumentElement;
+                XmlNode node = root.SelectSingleNode("//Temperature");
+                var nodeSplit = node.InnerText.Split('(')[1];
+                var nodeSplit2 = nodeSplit.Split(' ')[0];
+
+                using (DataContext dataContext = new DataContext())
+                {
+                    dataContext.Bevaegelser.Add(new Bevaegelser(dt, ts, decimal.Parse(nodeSplit2)));
+                    dataContext.SaveChanges();
+                }
+                dt = senesteDato;
+                ts = senesteTid;
+                if (_alarmBool)
+                {
+                    Alarmer();
+                }
+            }
+        }
+        private void Alarmer()
+        {
             using (DataContext dataContext = new DataContext())
             {
-                DateTime tidspunkt = DateTime.Now;
-                dataContext.Bevaegelser.Add(new Bevaegelser() {Temperatur = temp, Tidspunkt = tidspunkt});
-                dataContext.SaveChanges();
+                foreach (var bruger in dataContext.Brugere)
+                {
+                    SendEmail(bruger.Email, "Indbrud", "Der er indbrud!");
+                }
+                _alarmBool = false;
             }
-            lastTemp = temp;
-            //}
         }
     }
 }

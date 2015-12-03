@@ -1,24 +1,31 @@
-namespace WCFServiceWebRole1
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+
+namespace WCFServiceWebRole1.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
+
 
     [Table("Bevaegelser")]
-    public partial class Bevaegelser
+    [DataContract]
+    public class Bevaegelser
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DataMember]
         public int Id { get; set; }
 
-        public DateTime Tidspunkt { get; set; }
+        [DataMember]
+        [Column(TypeName = "date")]
+        public DateTime Dato { get; set; }
 
+        [DataMember]
+        public TimeSpan Tidspunkt { get; set; }
+
+        [DataMember]
         public decimal Temperatur { get; set; }
 
-        public Bevaegelser(int id, DateTime tidspunkt, decimal temperatur)
+        public Bevaegelser(DateTime dato, TimeSpan tidspunkt, decimal temperatur)
         {
-            Id = id;
+            Dato = dato;
             Tidspunkt = tidspunkt;
             Temperatur = temperatur;
         }

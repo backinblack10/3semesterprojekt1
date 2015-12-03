@@ -1,30 +1,27 @@
 using System.Linq;
-using System.Web.UI.WebControls;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
-namespace WCFServiceWebRole1
+namespace WCFServiceWebRole1.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
+    
 
     [Table("Brugere")]
-    public partial class Brugere
+    [DataContract]
+    public class Brugere
     {
         private string _password;
         private string _email;
-        private string _brugernavn;
         public int Id { get; set; }
 
+        [DataMember]
         [Required]
         [StringLength(50)]
-        public string Brugernavn
-        {
-            get { return _brugernavn; }
-            set { _brugernavn = value; }
-        }
+        public string Brugernavn { get; set; }
 
+        [DataMember]
         [Required]
         [StringLength(100)]
         public string Password
@@ -36,15 +33,36 @@ namespace WCFServiceWebRole1
                 _password = value;
             }
         }
+        // ReSharper disable once UnusedParameter.Local
         private void CheckPassword(string password)
         {
-            if (password == null || password.Length < 4 || password.Length > 20 || !password.Any(char.IsUpper) || !password.Any(char.IsDigit) || password.Contains(Brugernavn))
+            if (password == null)
             {
-                //throw new ArgumentException("Password er forkert" + " (" + password + ")");
-                throw new ArgumentException();
+                throw new ArgumentException("Password er tomt");
+            }
+            if (password.Length < 4)
+            {
+                throw new ArgumentException("Password skal være mere end 4 tegn");
+            }
+            if (password.Length > 20)
+            {
+                throw new ArgumentException("Password skal være mindre end 20 tegn");
+            }
+            if (!password.Any(char.IsUpper))
+            {
+                throw new ArgumentException("Password skal indeholde ét stort bogstav");
+            }
+            if (!password.Any(char.IsDigit))
+            {
+                throw new ArgumentException("Password skal indeholde ét tal");
+            }
+            if (password.Contains(Brugernavn))
+            {
+                throw new ArgumentException("Password må ikke indeholde dit brugernavn");
             }
         }
 
+        [DataMember]
         [Required]
         [StringLength(50)]
         public string Email
@@ -67,7 +85,7 @@ namespace WCFServiceWebRole1
 
         public Brugere(string brugernavn, string password, string email)
         {
-            _brugernavn = brugernavn;
+            Brugernavn = brugernavn;
             _password = password;
             _email = email;
 

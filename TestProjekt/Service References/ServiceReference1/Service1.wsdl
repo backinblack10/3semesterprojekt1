@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Service1" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:5017/Service1.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:5017/Service1.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:5017/Service1.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/WCFServiceWebRole1.Models" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IService1_SletHistorik_InputMessage">
+    <wsdl:part name="parameters" element="tns:SletHistorik" />
+  </wsdl:message>
+  <wsdl:message name="IService1_SletHistorik_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SletHistorikResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_OpretBruger_InputMessage">
+    <wsdl:part name="parameters" element="tns:OpretBruger" />
+  </wsdl:message>
+  <wsdl:message name="IService1_OpretBruger_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OpretBrugerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_OpdaterPassword_InputMessage">
+    <wsdl:part name="parameters" element="tns:OpdaterPassword" />
+  </wsdl:message>
+  <wsdl:message name="IService1_OpdaterPassword_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OpdaterPasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_OpdaterEmail_InputMessage">
+    <wsdl:part name="parameters" element="tns:OpdaterEmail" />
+  </wsdl:message>
+  <wsdl:message name="IService1_OpdaterEmail_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OpdaterEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_Login_InputMessage">
+    <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="IService1_Login_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_HentBevaegelser_InputMessage">
+    <wsdl:part name="parameters" element="tns:HentBevaegelser" />
+  </wsdl:message>
+  <wsdl:message name="IService1_HentBevaegelser_OutputMessage">
+    <wsdl:part name="parameters" element="tns:HentBevaegelserResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_HentTemperatur_InputMessage">
+    <wsdl:part name="parameters" element="tns:HentTemperatur" />
+  </wsdl:message>
+  <wsdl:message name="IService1_HentTemperatur_OutputMessage">
+    <wsdl:part name="parameters" element="tns:HentTemperaturResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_HentTidspunkt_InputMessage">
+    <wsdl:part name="parameters" element="tns:HentTidspunkt" />
+  </wsdl:message>
+  <wsdl:message name="IService1_HentTidspunkt_OutputMessage">
+    <wsdl:part name="parameters" element="tns:HentTidspunktResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GlemtPassword_InputMessage">
+    <wsdl:part name="parameters" element="tns:GlemtPassword" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GlemtPassword_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GlemtPasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GlemtBrugernavn_InputMessage">
+    <wsdl:part name="parameters" element="tns:GlemtBrugernavn" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GlemtBrugernavn_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GlemtBrugernavnResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IService1">
+    <wsdl:operation name="SletHistorik">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/SletHistorik" message="tns:IService1_SletHistorik_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/SletHistorikResponse" message="tns:IService1_SletHistorik_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OpretBruger">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/OpretBruger" message="tns:IService1_OpretBruger_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/OpretBrugerResponse" message="tns:IService1_OpretBruger_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OpdaterPassword">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/OpdaterPassword" message="tns:IService1_OpdaterPassword_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/OpdaterPasswordResponse" message="tns:IService1_OpdaterPassword_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OpdaterEmail">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/OpdaterEmail" message="tns:IService1_OpdaterEmail_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/OpdaterEmailResponse" message="tns:IService1_OpdaterEmail_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Login">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/Login" message="tns:IService1_Login_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/LoginResponse" message="tns:IService1_Login_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="HentBevaegelser">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/HentBevaegelser" message="tns:IService1_HentBevaegelser_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/HentBevaegelserResponse" message="tns:IService1_HentBevaegelser_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="HentTemperatur">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/HentTemperatur" message="tns:IService1_HentTemperatur_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/HentTemperaturResponse" message="tns:IService1_HentTemperatur_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="HentTidspunkt">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/HentTidspunkt" message="tns:IService1_HentTidspunkt_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/HentTidspunktResponse" message="tns:IService1_HentTidspunkt_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GlemtPassword">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GlemtPassword" message="tns:IService1_GlemtPassword_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GlemtPasswordResponse" message="tns:IService1_GlemtPassword_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GlemtBrugernavn">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GlemtBrugernavn" message="tns:IService1_GlemtBrugernavn_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GlemtBrugernavnResponse" message="tns:IService1_GlemtBrugernavn_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IService1" type="tns:IService1">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SletHistorik">
+      <soap:operation soapAction="http://tempuri.org/IService1/SletHistorik" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpretBruger">
+      <soap:operation soapAction="http://tempuri.org/IService1/OpretBruger" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpdaterPassword">
+      <soap:operation soapAction="http://tempuri.org/IService1/OpdaterPassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpdaterEmail">
+      <soap:operation soapAction="http://tempuri.org/IService1/OpdaterEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Login">
+      <soap:operation soapAction="http://tempuri.org/IService1/Login" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HentBevaegelser">
+      <soap:operation soapAction="http://tempuri.org/IService1/HentBevaegelser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HentTemperatur">
+      <soap:operation soapAction="http://tempuri.org/IService1/HentTemperatur" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HentTidspunkt">
+      <soap:operation soapAction="http://tempuri.org/IService1/HentTidspunkt" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GlemtPassword">
+      <soap:operation soapAction="http://tempuri.org/IService1/GlemtPassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GlemtBrugernavn">
+      <soap:operation soapAction="http://tempuri.org/IService1/GlemtBrugernavn" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service1">
+    <wsdl:port name="BasicHttpBinding_IService1" binding="tns:BasicHttpBinding_IService1">
+      <soap:address location="http://localhost:5017/Service1.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
